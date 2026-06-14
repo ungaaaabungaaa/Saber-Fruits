@@ -1,8 +1,10 @@
 import {
   applyBombHit,
   applyFruitMiss,
+  createRoomCode,
   createFruitHalves,
   formatLives,
+  getSaberTheme,
   shouldEndRound
 } from "./game-rules.js";
 
@@ -21,6 +23,16 @@ const connectionPill = document.querySelector("#connection-pill");
 const practiceButton = document.querySelector("#practice-button");
 const resetButton = document.querySelector("#reset-button");
 const infiniteButton = document.querySelector("#infinite-button");
+const colorButtons = Array.from(document.querySelectorAll("[data-saber-color]"));
+
+const themeCssVariables = {
+  saber: "--saber",
+  saber2: "--saber-2",
+  saberRgb: "--saber-rgb",
+  saber2Rgb: "--saber-2-rgb",
+  saberSoft: "--saber-soft",
+  saberGlow: "--saber-glow"
+};
 
 const params = new URLSearchParams(window.location.search);
 let roomId = params.get("room")?.toUpperCase() || createRoomCode();
@@ -39,6 +51,7 @@ let score = 0;
 let lives = 5;
 let infiniteLives = false;
 let audioContext;
+let saberTheme = getSaberTheme(readStoredSaberTheme());
 
 const fruits = [];
 const fruitHalves = [];
@@ -53,17 +66,43 @@ const blade = {
   trail: []
 };
 
-function createRoomCode() {
-  const alphabet = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
-  let code = "";
-  for (let i = 0; i < 6; i += 1) {
-    code += alphabet[Math.floor(Math.random() * alphabet.length)];
-  }
-  return code;
-}
-
 function clamp(value, min, max) {
   return Math.max(min, Math.min(max, value));
+}
+
+function readStoredSaberTheme() {
+  try {
+    return window.localStorage.getItem("saber-fruits-theme") || "mint";
+  } catch {
+    return "mint";
+  }
+}
+
+function storeSaberTheme(themeId) {
+  try {
+    window.localStorage.setItem("saber-fruits-theme", themeId);
+  } catch {
+    // Local storage can be disabled in private browsing; the game still works.
+  }
+}
+
+function applySaberTheme(themeId, shouldStore = true) {
+  saberTheme = getSaberTheme(themeId);
+  document.documentElement.dataset.saberTheme = saberTheme.id;
+
+  for (const [key, value] of Object.entries(saberTheme.css)) {
+    document.documentElement.style.setProperty(themeCssVariables[key], value);
+  }
+
+  colorButtons.forEach((button) => {
+    const selected = button.dataset.saberColor === saberTheme.id;
+    button.classList.toggle("is-selected", selected);
+    button.setAttribute("aria-pressed", String(selected));
+  });
+
+  if (shouldStore) {
+    storeSaberTheme(saberTheme.id);
+  }
 }
 
 function resize() {
@@ -113,7 +152,6 @@ async function renderQr() {
   roomCodeEl.textContent = roomId;
   hudRoomEl.textContent = roomId;
   controllerLink.href = url;
-  controllerLink.textContent = url;
 
   const response = await fetch(`/api/qr?text=${encodeURIComponent(url)}`);
   const { dataUrl } = await response.json();
@@ -149,10 +187,8 @@ function setLifeState(nextState) {
 }
 
 function updateModeButton() {
-  infiniteButton.setAttribute("aria-pressed", String(infiniteLives));
-  infiniteButton.querySelector("span").textContent = infiniteLives
-    ? "Infinite lives on"
-    : "Infinite lives off";
+  infiniteButton.setAttribute("aria-checked", String(infiniteLives));
+  infiniteButton.querySelector(".switch-state").textContent = infiniteLives ? "On" : "Off";
 }
 
 function connectWebSocket() {
@@ -417,12 +453,24 @@ function update(dt) {
 }
 
 function drawBackground() {
-  ctx.fillStyle = "#080a0f";
+  ctx.fillStyle = saberTheme.canvas.background;
+  ctx.fillRect(0, 0, width, height);
+
+  const glow = ctx.createRadialGradient(
+    blade.x,
+    blade.y,
+    0,
+    blade.x,
+    blade.y,
+    Math.max(width, height) * 0.72
+  );
+  glow.addColorStop(0, saberTheme.canvas.glow);
+  glow.addColorStop(1, "rgba(8, 10, 15, 0)");
+  ctx.fillStyle = glow;
   ctx.fillRect(0, 0, width, height);
 
   ctx.save();
-  ctx.globalAlpha = 0.22;
-  ctx.strokeStyle = "#253044";
+  ctx.strokeStyle = saberTheme.canvas.grid;
   ctx.lineWidth = 1;
   const gap = 72;
   for (let x = -gap; x < width + gap; x += gap) {
@@ -578,25 +626,27 @@ function drawBlade() {
     });
 
     if (pass === 0) {
-      ctx.strokeStyle = "rgba(98, 247, 213, 0.18)";
+      ctx.strokeStyle = saberTheme.blade.soft;
       ctx.lineWidth = 34;
-      ctx.shadowColor = "rgba(98, 247, 213, 0.8)";
+      ctx.shadowColor = saberTheme.blade.shadow;
       ctx.shadowBlur = 28;
     } else if (pass === 1) {
-      ctx.strokeStyle = "rgba(98, 247, 213, 0.72)";
+      ctx.strokeStyle = saberTheme.blade.strong;
       ctx.lineWidth = 14;
+      ctx.shadowColor = saberTheme.blade.shadow;
       ctx.shadowBlur = 18;
     } else {
-      ctx.strokeStyle = "#ffffff";
+      ctx.strokeStyle = saberTheme.blade.core;
       ctx.lineWidth = 4;
+      ctx.shadowColor = saberTheme.blade.core;
       ctx.shadowBlur = 8;
     }
 
     ctx.stroke();
   }
 
-  ctx.fillStyle = "#ffffff";
-  ctx.shadowColor = "rgba(249, 248, 113, 0.85)";
+  ctx.fillStyle = saberTheme.blade.core;
+  ctx.shadowColor = saberTheme.blade.tipShadow;
   ctx.shadowBlur = 24;
   ctx.beginPath();
   ctx.arc(blade.x, blade.y, 8, 0, Math.PI * 2);
@@ -696,10 +746,17 @@ infiniteButton.addEventListener("click", () => {
   updateModeButton();
 });
 
+colorButtons.forEach((button) => {
+  button.addEventListener("click", () => {
+    applySaberTheme(button.dataset.saberColor);
+  });
+});
+
 window.addEventListener("resize", resize);
 window.addEventListener("pointermove", handlePointerMove);
 window.addEventListener("pointerdown", unlockAudio);
 
+applySaberTheme(saberTheme.id, false);
 resize();
 resetRound();
 updateModeButton();

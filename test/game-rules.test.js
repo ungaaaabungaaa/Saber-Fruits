@@ -4,8 +4,10 @@ import { test } from "node:test";
 import {
   applyBombHit,
   applyFruitMiss,
+  createRoomCode,
   createFruitHalves,
   formatLives,
+  getSaberTheme,
   shouldEndRound
 } from "../public/game-rules.js";
 
@@ -36,6 +38,26 @@ test("only normal mode at zero lives ends the round", () => {
 test("infinite lives displays as an infinity symbol", () => {
   assert.equal(formatLives({ lives: 3, infiniteLives: true }), "∞");
   assert.equal(formatLives({ lives: 3, infiniteLives: false }), "3");
+});
+
+test("saber themes provide UI and blade colors with mint fallback", () => {
+  const blue = getSaberTheme("blue");
+  const fallback = getSaberTheme("unknown");
+
+  assert.equal(blue.id, "blue");
+  assert.equal(blue.label, "Blue");
+  assert.equal(blue.css.saber, "#63a7ff");
+  assert.equal(blue.blade.core, "#ffffff");
+  assert.match(blue.blade.soft, /^rgba\(/);
+  assert.equal(fallback.id, "mint");
+});
+
+test("generated room codes avoid vowels for public display", () => {
+  const code = createRoomCode(6, () => 0.99);
+
+  assert.equal(code.length, 6);
+  assert.match(code, /^[BCDFGHJKLMNPQRSTVWXYZ23456789]+$/);
+  assert.doesNotMatch(code, /[AEIOU]/);
 });
 
 test("fruit slice creates two halves that move apart", () => {

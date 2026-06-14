@@ -1,3 +1,164 @@
+const SABER_THEMES = [
+  {
+    id: "mint",
+    label: "Mint",
+    css: {
+      saber: "#62f7d5",
+      saber2: "#f9f871",
+      saberRgb: "98, 247, 213",
+      saber2Rgb: "249, 248, 113",
+      saberSoft: "rgba(98, 247, 213, 0.14)",
+      saberGlow: "rgba(98, 247, 213, 0.72)"
+    },
+    blade: {
+      soft: "rgba(98, 247, 213, 0.18)",
+      strong: "rgba(98, 247, 213, 0.72)",
+      shadow: "rgba(98, 247, 213, 0.8)",
+      core: "#ffffff",
+      tipShadow: "rgba(249, 248, 113, 0.85)"
+    },
+    canvas: {
+      background: "#080a0f",
+      grid: "rgba(98, 247, 213, 0.16)",
+      glow: "rgba(98, 247, 213, 0.08)"
+    }
+  },
+  {
+    id: "blue",
+    label: "Blue",
+    css: {
+      saber: "#63a7ff",
+      saber2: "#7cf7ff",
+      saberRgb: "99, 167, 255",
+      saber2Rgb: "124, 247, 255",
+      saberSoft: "rgba(99, 167, 255, 0.14)",
+      saberGlow: "rgba(99, 167, 255, 0.72)"
+    },
+    blade: {
+      soft: "rgba(99, 167, 255, 0.18)",
+      strong: "rgba(99, 167, 255, 0.74)",
+      shadow: "rgba(99, 167, 255, 0.82)",
+      core: "#ffffff",
+      tipShadow: "rgba(124, 247, 255, 0.78)"
+    },
+    canvas: {
+      background: "#070b14",
+      grid: "rgba(99, 167, 255, 0.16)",
+      glow: "rgba(99, 167, 255, 0.08)"
+    }
+  },
+  {
+    id: "violet",
+    label: "Violet",
+    css: {
+      saber: "#b58cff",
+      saber2: "#ff8cf3",
+      saberRgb: "181, 140, 255",
+      saber2Rgb: "255, 140, 243",
+      saberSoft: "rgba(181, 140, 255, 0.14)",
+      saberGlow: "rgba(181, 140, 255, 0.72)"
+    },
+    blade: {
+      soft: "rgba(181, 140, 255, 0.18)",
+      strong: "rgba(181, 140, 255, 0.74)",
+      shadow: "rgba(181, 140, 255, 0.82)",
+      core: "#ffffff",
+      tipShadow: "rgba(255, 140, 243, 0.74)"
+    },
+    canvas: {
+      background: "#0a0812",
+      grid: "rgba(181, 140, 255, 0.15)",
+      glow: "rgba(181, 140, 255, 0.08)"
+    }
+  },
+  {
+    id: "pink",
+    label: "Pink",
+    css: {
+      saber: "#ff6fb1",
+      saber2: "#ffd166",
+      saberRgb: "255, 111, 177",
+      saber2Rgb: "255, 209, 102",
+      saberSoft: "rgba(255, 111, 177, 0.14)",
+      saberGlow: "rgba(255, 111, 177, 0.7)"
+    },
+    blade: {
+      soft: "rgba(255, 111, 177, 0.18)",
+      strong: "rgba(255, 111, 177, 0.72)",
+      shadow: "rgba(255, 111, 177, 0.78)",
+      core: "#ffffff",
+      tipShadow: "rgba(255, 209, 102, 0.78)"
+    },
+    canvas: {
+      background: "#100811",
+      grid: "rgba(255, 111, 177, 0.15)",
+      glow: "rgba(255, 111, 177, 0.075)"
+    }
+  },
+  {
+    id: "gold",
+    label: "Gold",
+    css: {
+      saber: "#ffd166",
+      saber2: "#ff8a3d",
+      saberRgb: "255, 209, 102",
+      saber2Rgb: "255, 138, 61",
+      saberSoft: "rgba(255, 209, 102, 0.14)",
+      saberGlow: "rgba(255, 209, 102, 0.7)"
+    },
+    blade: {
+      soft: "rgba(255, 209, 102, 0.18)",
+      strong: "rgba(255, 209, 102, 0.72)",
+      shadow: "rgba(255, 209, 102, 0.78)",
+      core: "#ffffff",
+      tipShadow: "rgba(255, 138, 61, 0.78)"
+    },
+    canvas: {
+      background: "#0f0b06",
+      grid: "rgba(255, 209, 102, 0.15)",
+      glow: "rgba(255, 209, 102, 0.075)"
+    }
+  },
+  {
+    id: "white",
+    label: "White",
+    css: {
+      saber: "#f7fbff",
+      saber2: "#9ba7b8",
+      saberRgb: "247, 251, 255",
+      saber2Rgb: "155, 167, 184",
+      saberSoft: "rgba(247, 251, 255, 0.12)",
+      saberGlow: "rgba(247, 251, 255, 0.58)"
+    },
+    blade: {
+      soft: "rgba(247, 251, 255, 0.16)",
+      strong: "rgba(247, 251, 255, 0.68)",
+      shadow: "rgba(247, 251, 255, 0.72)",
+      core: "#ffffff",
+      tipShadow: "rgba(155, 167, 184, 0.8)"
+    },
+    canvas: {
+      background: "#07090d",
+      grid: "rgba(247, 251, 255, 0.12)",
+      glow: "rgba(247, 251, 255, 0.055)"
+    }
+  }
+];
+
+const ROOM_CODE_ALPHABET = "BCDFGHJKLMNPQRSTVWXYZ23456789";
+
+export function createRoomCode(length = 6, random = Math.random) {
+  let code = "";
+  for (let i = 0; i < length; i += 1) {
+    code += ROOM_CODE_ALPHABET[Math.floor(random() * ROOM_CODE_ALPHABET.length)];
+  }
+  return code;
+}
+
+export function getSaberTheme(themeId) {
+  return SABER_THEMES.find((theme) => theme.id === themeId) || SABER_THEMES[0];
+}
+
 export function applyFruitMiss(state) {
   return { ...state };
 }

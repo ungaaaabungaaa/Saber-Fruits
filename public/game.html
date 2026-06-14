@@ -41,12 +41,30 @@
 
       <div class="room-code" id="room-code">------</div>
       <p class="status-copy" id="status-copy">Pairing room...</p>
-      <a class="manual-link" id="controller-link" href="#">Open controller</a>
+      <a class="manual-link" id="controller-link" href="#" target="_blank" rel="noreferrer">Open controller on this device</a>
 
-      <button class="mode-toggle" id="infinite-button" type="button" aria-pressed="false">
-        <iconify-icon icon="mdi:infinity"></iconify-icon>
-        <span>Infinite lives off</span>
+      <button class="switch-toggle" id="infinite-button" type="button" role="switch" aria-checked="false">
+        <span class="switch-label">
+          <iconify-icon icon="mdi:infinity"></iconify-icon>
+          <span>Infinite lives</span>
+        </span>
+        <span class="switch-track" aria-hidden="true">
+          <span class="switch-thumb"></span>
+        </span>
+        <span class="switch-state">Off</span>
       </button>
+
+      <div class="theme-picker" aria-label="Saber color">
+        <span>Saber color</span>
+        <div class="theme-dots">
+          <button class="color-dot is-selected" type="button" data-saber-color="mint" aria-label="Mint saber" aria-pressed="true"></button>
+          <button class="color-dot" type="button" data-saber-color="blue" aria-label="Blue saber" aria-pressed="false"></button>
+          <button class="color-dot" type="button" data-saber-color="violet" aria-label="Violet saber" aria-pressed="false"></button>
+          <button class="color-dot" type="button" data-saber-color="pink" aria-label="Pink saber" aria-pressed="false"></button>
+          <button class="color-dot" type="button" data-saber-color="gold" aria-label="Gold saber" aria-pressed="false"></button>
+          <button class="color-dot" type="button" data-saber-color="white" aria-label="White saber" aria-pressed="false"></button>
+        </div>
+      </div>
 
       <div class="waiting-actions">
         <button id="practice-button" type="button">
@@ -60,6 +78,6 @@
       </div>
     </section>
 
-    <script type="module" src="/game.js?v=split-halves"></script>
+    <script type="module" src="/game.js?v=theme-controls"></script>
   </body>
 </html>
