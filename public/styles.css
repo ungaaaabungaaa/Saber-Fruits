@@ -239,10 +239,8 @@ button:disabled {
   gap: 10px;
 }
 
-.brand-lockup h1 {
-  margin: 0;
-  font-size: clamp(1.7rem, 5vw, 2.4rem);
-  line-height: 1;
+.brand-lockup {
+  justify-content: center;
 }
 
 .brand-icon {
